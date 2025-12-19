@@ -33,9 +33,13 @@
 ----------
 
 ## 2.使用方法
-将通过一个极板电容（图1）仿真分析的应用案例，介绍使用方法和特点，以展示本软件的功能。
+将通过一个C形谐振器（图1）仿真分析的应用案例，介绍使用方法和特点，以展示本软件的功能。
 
-![图1极板电容示意图](C:\Users\LENOVO\Desktop\readme\1.png)
+图1C形谐振器示意图
+
+<img width="1149" height="1062" alt="4" src="https://github.com/user-attachments/assets/92108afc-2712-40d9-945d-427523eb913c" />
+
+
 ### 2.1数据导入
 本软件将读入三种输入数据，分别为物理结构网格剖分信息、材料信息和仿真设定。以下是代码的目录结构说明
 
@@ -170,13 +174,19 @@ Physical Surface(1) = {1, 2};
 ### 2.3等效电路提取
 如图2所示本软件将根据分元等效电路理论，将模型剖分以及连结网络转化为由分布式电容、电感组成的分元等效电路。
 
-![图2模型剖分转译为分元等效电路概念图](C:\Users\LENOVO\Desktop\readme\2.png)
+图2模型剖分转译为分元等效电路概念图
+
+<img width="1020" height="333" alt="2" src="https://github.com/user-attachments/assets/56da100f-5a2b-4352-8649-7c579ab2114d" />
+
 
 本节将通过积分生成两种矩阵，分为电位矩阵（P），电感矩阵（L）。
 ### 2.4 电路求解分析
 本节利用自研代码，在频率域对提取的等效电路使用***修正节点分析法(Modified Nodal Analysis)***进行分析，求解得到电路中的电流、电势、电荷等信息。核心方程如下：
 
-![核心方程](C:\Users\LENOVO\Desktop\readme\3.png)
+核心方程
+
+<img width="442" height="133" alt="3" src="https://github.com/user-attachments/assets/b4328c20-57eb-4fd8-8d61-177e7fbad914" />
+
 
 在本例中，共有节点数 ， 支路数 ，在0.5GHz到5GHz间共选300个频率点进行计算，求得以下两类信息：
 - 端口电流信息
