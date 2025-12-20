@@ -1,4 +1,4 @@
-<img width="40" height="40" alt="NanoBanana-2025-12-20" src="https://github.com/user-attachments/assets/aa53b5ca-b76e-4d1f-893a-2e7cd38f6428" />
+<img width="100" height="100" alt="PEEC SOLVER" src="https://github.com/user-attachments/assets/f151993e-d63b-4202-8feb-84d7821baba1" />
 
 # 分元电磁仿真软件
 
