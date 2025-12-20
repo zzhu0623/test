@@ -1,3 +1,5 @@
+<img width="40" height="40" alt="NanoBanana-2025-12-20" src="https://github.com/user-attachments/assets/aa53b5ca-b76e-4d1f-893a-2e7cd38f6428" />
+
 # 分元电磁仿真软件
 
 ## 项目简介
