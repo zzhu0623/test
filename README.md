@@ -1,56 +1,58 @@
+# Quasi-Static Free Space PEEC Electromagnetic Solver Engine
 
-# 准静态自由空间PEEC电磁求解引擎
+## Project Overview
 
-## 项目简介
+The Quasi-Static Free Space PEEC Electromagnetic Solver Engine is an electromagnetic simulation tool developed based on the Partial Element Equivalent Circuit (PEEC) method. It is suitable for simulating and analyzing the electromagnetic characteristics of electronic components such as integrated circuits, RF devices, metamaterials, and array antennas.
 
-准静态自由空间PEEC电磁求解引擎是一款基于分元等效电路方法（Partial Element Equivalent Circuit, PEEC）开发的电磁仿真工具，适用于集成电路、射频器件、超材料、阵列天线等电子元器件的电磁特性仿真与设计分析。
-
-> 发布日期：2025年
-
-> 版本：V1.0
+> Release Date: 2025
+> Version: V1.0
 
 ----------
 
-##  1. 功能概述
+## 1. Functional Overview
 
-本软件通过以下六个核心模块完成电磁仿真流程：
+This software completes the electromagnetic simulation process through the following six core modules:
 
-1.  **初始化** 
-– 生成必要的参数库，如高斯积分数据库，为后续计算提供支持。
-    
-2.  **数据导入**
- – 读取电子器件的物理模型、材料参数和仿真设置等所需信息。
-    
-3.  **数据预处理** 
-– 对物理模型进行拓扑分析，提炼网格连结关系，生成等效电路所需信息。
-    
-4.  **等效电路提取**
- – 通过计算单元离散积分，生成并输出分元等效电路模型。
-    
-5.  **电路求解分析**
- – 利用修正节点分析法，求解电路中的未知电压、电流、电荷分布等主要电磁表征。
-    
-6.  **评估设计表现** 
-– 计算端口散射参数（S parameter），阻抗参数（Z parameter），端口电压电流分布等目标参数。
+1.  **Initialization**
+    – Generates necessary parameter libraries, such as Gaussian integration databases, to support subsequent calculations.
+
+2.  **Data Import**
+    – Reads input information required for simulation, including the physical model of the electronic device, material parameters, and simulation settings.
+
+3.  **Data Preprocessing**
+    – Performs topological analysis on the physical model, extracts grid connectivity relationships, and generates information required for the equivalent circuit.
+
+4.  **Equivalent Circuit Extraction**
+    – Generates and outputs the partial element equivalent circuit model by calculating discretized integrals over the elements.
+
+5.  **Circuit Solution and Analysis**
+    – Solves for key electromagnetic characteristics in the circuit, such as unknown voltages, currents, and charge distributions, using the Modified Nodal Analysis method in the frequency domain.
+
+6.  **Performance Evaluation**
+    – Calculates target parameters including port scattering parameters (S-parameters), impedance parameters (Z-parameters), and port voltage/current distributions.
+
 ***
-##  2.  模型准备（可选）
-本软件需使用后缀为".msh"的网格文件，可以使用**GMSH 2.2版本**生成。  
-GMSH 是一款开源有限元网格生成工具，可将复杂几何模型离散化为三角形、四面体等单元，广泛应用于各类仿真计算。本软件目前主要支持基于三角形的网格剖分数据。
-使用时，请将生成的网格文件重命名为 **model.msh**，接下来以C形谐振器为例，说明如何生成所需模型文件（基于 GMSH-2.2 ）。
-首先先定义物理模型，格式如下：   
+## 2. Model Preparation (Optional)
 
-***示例：C形谐振器***
+This software requires a mesh file with the `".msh"` extension, which can be generated using **GMSH version 2.2**.
 
-定义点
+GMSH is an open-source finite element mesh generation tool that can discretize complex geometric models into elements such as triangles and tetrahedra. It is widely used in various simulation computations. This software currently primarily supports mesh data based on triangular elements.
+
+For use, rename the generated mesh file to **model.msh**. The following example uses a C-shaped resonator to illustrate how to generate the required model file (based on GMSH-2.2).
+
+First, define the physical model using the following format:
+
+***Example: C-shaped Resonator***
+
+Define Points
 ```
 Point(1) = {20, 0-20, 1.8, lc};
 ...
 Point(26) = {10.5, 43-20, 1.8 , lc};
 ```
-定义线
+Define Lines
 ```
 Line(2) = {1, 6};
-
 ...
 Line(16) = {7, 6};
 Line(23) = {17, 16};
@@ -60,40 +62,40 @@ Line(51) = {13, 23};
 ...
 Line(62) = {20, 22};
 ```
-定义线环
+Define Line Loops
 ```
 Line Loop(63) = {14, 8, 9, 10, 11, 12, -53, 54, 55, 56, -51};
 Line Loop(65) = {15, -3, -16, -11};
 Line Loop(67) = {2, 3, 4, 5, 6, 7, 57, 60, 61, 62, 59};
 ```
-定义面
+Define Surfaces
 ```
 Plane Surface(64) = {63};
 Plane Surface(66) = {65};
 Plane Surface(68) = {67};
 ```
 ***
-**需要强调的是：为了保证本软件正确仿真，必须添加激励线，并通过线属性指定其阻抗。激励线两端需避免与网格顶点重合，应位于网格边界或内部。例如，将编号为23和24的线定义为阻抗120Ω的激励线，对应的GMSH命令如下：**  
+**It must be emphasized: To ensure correct simulation by this software, excitation lines must be added and their impedance specified via line properties. The endpoints of excitation lines should avoid coinciding with mesh vertices; they should be located on mesh boundaries or inside elements. For example, to define lines numbered 23 and 24 as excitation lines with an impedance of 120Ω, the corresponding GMSH command is as follows:**
 ```
 Physical Line(120) = {24, 23};
 ```
 ***
-所有面初始属性设置为1，代表完美金属导体，后续算法将扩展至支持异质材料分析。定义示例：
+The initial property for all surfaces is set to 1, representing a perfect electric conductor (PEC). Subsequent algorithm versions will be extended to support heterogeneous material analysis. Definition example:
 ```
 Physical Surface(1) = {64, 81, 93, 66, 68, 69};
 ```
 
-**完成上述设置后，使用GMSH软件生成对应的`.msh`文件。**
+**After completing the above setup, use the GMSH software to generate the corresponding `.msh` file.**
 ***
-将物理模型转换为的含有物理信息的网格模型， 以下列出了C形谐振器的网格剖分文件内容，用以说明输入网格剖分信息的主要格式（基于GMSH-2.2）。
-   
- ***1.版本号***
+The physical model is converted into a mesh model containing physical information. The following lists the content of the mesh file for the C-shaped resonator to illustrate the main format of the input mesh data (based on GMSH-2.2).
+
+***1. Version Number***
 ```
-$MeshFormat							
+$MeshFormat
 2.2 0 8
 $EndMeshFormat
 ```
-***2.节点信息***
+***2. Node Information***
 ```
 $Nodes
 1050
@@ -104,7 +106,7 @@ $Nodes
 1050 18.50000000000017 16.35000000000063 -1.8
 $EndNodes
 ```
-***3.网格信息***
+***3. Element Information***
 ```
 $Elements
 1634
@@ -116,183 +118,183 @@ $Elements
 1634 2 2 1 93 378 1050 1014
 $EndElements
 ```
-***注：不能对线进行多段剖分，必须保证其为完整一根***
-##  3. 使用方法
-通过一个C形谐振器（图1）仿真分析的应用案例，介绍使用方法和特点，以展示本软件的功能。
-                                                   
+***Note: A line must not be segmented into multiple parts during meshing; it must remain a single, complete element.***
+
+## 3. Usage Instructions
+
+This section introduces the software's features and usage method through an application case involving the simulation and analysis of a C-shaped resonator (Figure 1).
+
 <div align="center">
  <img width="1951" height="1002" alt="5" src="https://github.com/user-attachments/assets/3135430b-5170-4661-8fa2-70ae4df0dfa6" />
 </div>
 
-<p align="center">图1 C形谐振器示意图</p>  
+<p align="center">Figure 1: Schematic Diagram of the C-shaped Resonator</p>
 
-### 3.1 数据导入
-本软件将读入三种输入数据，分别为物理结构网格剖分信息、材料信息和仿真设定。以下是代码的目录结构说明
+### 3.1 Data Import
+
+The software reads three types of input data: mesh information of the physical structure, material information, and simulation settings. The following describes the directory structure of the code.
+
 ```
 Sur_PEC/
 
-├── Data/        # 数据存放文件 
+├── Data/        # Data storage directory
 
-    ├── model.msh         # 需要仿真的模型文件
-    
-    ├── Output/         # 输出结果目录
+    ├── model.msh         # Model file for simulation
 
-        ├── CirNetList.txt   # 电路文件
+    ├── Output/         # Output results directory
 
-        ├── CirNetList.sp   # SPICE网表
+        ├── CirNetList.txt   # Circuit file
 
-        ├── map.txt     # 端口散射参数
+        ├── CirNetList.sp   # SPICE netlist
 
-        ├── Z_in.txt     # 端口阻抗
+        ├── map.txt     # Port scattering parameters
 
-        └── Y_in.txt     # 端口导纳
+        ├── Z_in.txt     # Port impedance
 
-    ├── DIELECTRIC.txt  # 介质参数文件
-    
-    └── set.txt         # 配置文件
-    
-├── libiomp5md.dll      # 动态链接库
-    
-└── Sur_PEC.exe         # 仿真可执行程序
+        └── Y_in.txt     # Port admittance
+
+    ├── DIELECTRIC.txt  # Dielectric parameters file
+
+    └── set.txt         # Configuration file
+
+├── libiomp5md.dll      # Dynamic link library
+
+└── Sur_PEC.exe         # Simulation executable program
 ```
 
-####  3.1.1 **model.msh** - 模型文件
+#### 3.1.1 **model.msh** - Model File
 
--   **用途**：表明仿真所需的网格文件
-    
--   **注意事项**：将需要进行仿真的模型文件重命名为model.msh，并放入Data文件夹下以确保仿真能够正确顺利运行  
+-   **Purpose**: Specifies the mesh file required for simulation.
+-   **Note**: Rename the model file to be simulated as `model.msh` and place it in the `Data` folder to ensure the simulation runs correctly and smoothly.
+
 ***
-####  3.1.2 **DIELECTRIC.txt** - 材料信息文档
+#### 3.1.2 **DIELECTRIC.txt** - Material Information Document
 
--   **用途**：定义仿真中使用的介质材料参数
-    
--   **说明**：此文件为后续支持异质仿真的预设文件，**当前版本下不需要修改**
-***    
-#### 3.1.3 **set.txt** - 主要配置文件
+-   **Purpose**: Defines the dielectric material parameters used in the simulation.
+-   **Explanation**: This file is a preset for future support of heterogeneous material simulation. **In the current version, no modification is needed.**
 
--   **用途**：设置仿真的主要参数
-    
--   **重要说明**：**此文件需要根据具体仿真需求进行修改**
-    
--   **六种仿真参数将被键入，主要需修改的参数包括**：
+***
+#### 3.1.3 **set.txt** - Main Configuration File
 
-    -   **Solver_SET**（频域/时域求解，其中0表示频域求解，1表示时域求解）
-    
-    -   **FS** （仿真起始频率）
-        
-    -   **FE** （仿真结束频率）
-        
-    -  **N_FP**（ 求解频点数目）
-        
-    -   **DIM**（缩放尺寸）
-        
-    - **ER**  （介电常数）
- ```
+-   **Purpose**: Sets the main parameters for the simulation.
+-   **Important Note**: **This file must be modified according to specific simulation requirements.**
+-   **Six simulation parameters will be entered. The main parameters that need modification include**:
+    -   **Solver_SET** (Frequency Domain/Time Domain Solver, where 0 indicates frequency domain solving, 1 indicates time domain solving)
+    -   **FS** (Simulation Start Frequency)
+    -   **FE** (Simulation End Frequency)
+    -   **N_FP** (Number of Frequency Points to Solve)
+    -   **DIM** (Scaling Dimension)
+    -   **ER** (Dielectric Constant)
+
+```
 Solver_SET    0
 FS 		5e8
 FE 		5e9
-N_FP 	200	
+N_FP 	200
 DIM		1e3
 ER 		1.0
- ```
- 
- 如以上演示文档的内容，表示为频域求解，求解电磁器件频率范围为 0.5G 赫兹至 5G 赫兹，在该范围内平均提取 200 个频点作为计算频率，且该模型定义为毫米尺寸（1m=1000mm），介电常数为1。
+```
 
- 
- ***注：该版本下时域求解为demo版，请使用频域求解，并将Solver_SET默认设置为0***
- 
- ***
+As shown in the example configuration above, it represents frequency domain solving, with a frequency range from 0.5 GHz to 5 GHz for the electromagnetic device. Within this range, 200 frequency points are evenly selected as calculation frequencies. The model is defined as having millimeter-scale dimensions (1m = 1000mm), and the dielectric constant is 1.
 
-### 3.2 等效电路提取
-如图2所示基于分元等效电路理论，软件将模型剖分以及连结网络转化为由分布式电容、电感组成的分元等效电路。
- 
+***Note: The time domain solver in this version is a demo version. Please use the frequency domain solver and set Solver_SET to 0 by default.***
+
+***
+
+### 3.2 Equivalent Circuit Extraction
+
+As shown in Figure 2, based on the Partial Element Equivalent Circuit theory, the software converts the model's mesh and connection network into a partial element equivalent circuit composed of distributed capacitances and inductances.
+
 <div align="center">
  <img width="1020" height="333" alt="2" src="https://github.com/user-attachments/assets/56da100f-5a2b-4352-8649-7c579ab2114d" />
 </div>
 
-<p align="center">图2 模型剖分转译为分元等效电路概念图</p>  
+<p align="center">Figure 2: Conceptual Diagram of Model Discretization Translated into a Partial Element Equivalent Circuit</p>
 
-本节将通过积分生成两种矩阵，分为电位矩阵（P），电感矩阵（L）。
-### 3.3 电路求解分析
-本节利用自研代码，在频率域对提取的等效电路使用修正节点分析法(Modified Nodal Analysis)进行分析，求解得到电路中的电流、电势、电荷等信息。核心方程如下：
+This section generates two matrices through integration: the potential coefficient matrix (P) and the inductance matrix (L).
+
+### 3.3 Circuit Solution and Analysis
+
+This section utilizes self-developed code to analyze the extracted equivalent circuit in the frequency domain using the Modified Nodal Analysis (MNA) method, solving for information such as currents, potentials, and charges within the circuit. The core equation is as follows:
 
 <div align="center">
  <img width="442" height="133" alt="3" src="https://github.com/user-attachments/assets/b4328c20-57eb-4fd8-8d61-177e7fbad914" />
 </div>
 
-<p align="center">核心方程</p>  
+<p align="center">Core Equation</p>
 
-本例在0.5GHz到5GHz间共选200个频率点进行计算，在求解的过程中还会生成一个等效电路文档包含：端口数、端口节点、元件数、等效元件名称、连结节点、耦合强度等信息，内容如下所示。
+In this example, a total of 200 frequency points between 0.5GHz and 5GHz are selected for calculation. During the solving process, an equivalent circuit document is also generated containing information such as: number of ports, port nodes, number of elements, equivalent element names, connecting nodes, and coupling strength. The content is as follows:
+
 ```
-N_PORT 2            端口数                                                端口信息
+N_PORT 2            Number of Ports                                              Port Information
 PO_1      1369     264
-PO_2       815    1092        端口节点
+PO_2       815    1092        Port Nodes
 
 N_ELEMENT 6260928
-LL_1_1           0         2  8.7224591179E-11                            电感信息
+LL_1_1           0         2  8.7224591179E-11                            Inductance Information
 LM_1_2           0         2         0         3 -2.1744683326E-11
 LM_1_3           0         2         1        29  8.6677865715E-13
-...等效元件名称                连结节点                       元件值
+...Equivalent Element Name               Connecting Nodes                  Element Value
 LM_2220_2218        1621      1622      1619      1631 -9.2443493820E-13
 LM_2220_2219        1621      1622      1620      1623 -3.8458394158E-11
 
-CC_1_1           1         0  4.2690843441E-14                            电容信息
+CC_1_1           1         0  4.2690843441E-14                            Capacitance Information
 CC_1_2           1         2 -2.1754451536E-18
 ...
 CC_1631_1632        1631      1632 -3.2329462645E-20
 CC_1632_1632        1632         0  3.0259206314E-14
 ```
-### 3.4 评估设计表现
-本节对所求结果进行后处理，得到以下三个文档存于`Output`文件夹下：
 
-- **端口散射参数（S-parameter）**：储存于Sur_PEC\Data\Output\map.txt中
-```
-      求解频率     实部S(1,1)(dB)    虚部S(1,1)	 实部S(2,2)(dB)    虚部S(2,2)    实部S(1,2)(dB)    虚部S(1,2)    实部S(2,1)(dB)   虚部S(2,1)
-   5.225000e+08,  -1.482463e+01,  3.962179e+01,  -1.453806e-01,  1.296218e+02,  -1.454241e-01,  1.296218e+02,  -1.482463e+01,  3.962182e+01
-   5.450000e+08,  -1.446840e+01,  3.743193e+01,  -1.580369e-01,  1.274319e+02,  -1.580843e-01,  1.274319e+02,  -1.446840e+01,  3.743195e+01
-   5.675000e+08,  -1.412683e+01,  3.523903e+01,  -1.712264e-01,  1.252390e+02,  -1.712779e-01,  1.252390e+02,  -1.412683e+01,  3.523901e+01
-   ...
-```
-- **端口阻抗（Impedance）**：储存于Sur_PEC\Data\Output\Z_in.txt中
-```
-     求解频率       实部Z(1,1)      虚部Z(1,1)	   实部Z(2,2)      虚部Z(2,2)       实部Z(1,2)     虚部Z(1,2)      实部Z(2,1)     虚部Z(2,1)
-   5.150000e+08,  0.000000e+00,  -1.355504e+02,  -0.000000e+00,  2.078720e+02,  -0.000000e+00,  2.078706e+02,  0.000000e+00,  -1.355489e+02
-   5.300000e+08,  0.000000e+00,  -1.288976e+02,  -0.000000e+00,  2.038118e+02,  -0.000000e+00,  2.038103e+02,  0.000000e+00,  -1.288961e+02
-   5.450000e+08,  0.000000e+00,  -1.225001e+02,  -0.000000e+00,  2.000577e+02,  -0.000000e+00,  2.000562e+02,  0.000000e+00,  -1.224985e+02
-   5.600000e+08,  0.000000e+00,  -1.163339e+02,  -0.000000e+00,  1.965888e+02,  -0.000000e+00,  1.965872e+02,  0.000000e+00,  -1.163323e+02
-   ...
-```
-- **端口导纳（Admittance）**：储存于Sur_PEC\Data\Output\Y_in.txt中
-```
-   求解频率         实部Y(1,1)       虚部Y(1,1)	  实部Y(2,2)      虚部Y(2,2)       实部Y(1,2)     虚部Y(1,2)      实部Y(2,1)      虚部Y(2,1)
-   5.150000e+08,  0.000000e+00,  -5.457594e-03,  0.000000e+00,  -8.369530e-03,  0.000000e+00,  -8.369473e-03,  0.000000e+00,  -5.457653e-03
-   5.300000e+08,  0.000000e+00,  -5.171451e-03,  0.000000e+00,  -8.177151e-03,  0.000000e+00,  -8.177091e-03,  0.000000e+00,  -5.171511e-03
-   5.450000e+08,  0.000000e+00,  -4.896669e-03,  0.000000e+00,  -7.996965e-03,  0.000000e+00,  -7.996903e-03,  0.000000e+00,  -4.896731e-03
-   5.600000e+08,  0.000000e+00,  -4.632269e-03,  0.000000e+00,  -7.828027e-03,  0.000000e+00,  -7.827964e-03,  0.000000e+00,  -4.632333e-03
-   ...
-```
-***    
-## 4. 注意事项
+### 3.4 Performance Evaluation
 
-1.  确保所有必需的DLL文件位于运行目录。
-    
-2. 输入格式仅支持GMSH网格文件（.msh），建议使用GMSH生成，并确保为三角形剖分。
-    
-3.  材料文件需严格按格式编写，避免解析错误。
-    
-4.  大型模型仿真时注意内存与计算时间。
-    
-## 5. 可视化工具推荐 
-网格剖分文档（.msh）推荐使用 **GMSH.exe**打开， GMSH.exe 将直接生成三维可交互图形。(GMSH附于文件夹内）。
+This section performs post-processing on the obtained results, generating the following three documents stored in the `Output` folder:
 
-电流、电压、端口散射参数，阻抗参数(.dat)等参数推荐使用**EXCEL，Origin**等数据分析工具进行视图绘制
+-   **Port Scattering Parameters (S-parameters)**: Stored in `Sur_PEC\Data\Output\map.txt`
+    ```
+       Frequency (Hz)  Real(S11)(dB)     Imag(S11)    Real(S22)(dB)     Imag(S22)    Real(S12)(dB)    Imag(S12)     Real(S21)(dB)    Imag(S21)
+       5.225000e+08,  -1.482463e+01,  3.962179e+01,  -1.453806e-01,  1.296218e+02,  -1.454241e-01,  1.296218e+02,  -1.482463e+01,  3.962182e+01
+       5.450000e+08,  -1.446840e+01,  3.743193e+01,  -1.580369e-01,  1.274319e+02,  -1.580843e-01,  1.274319e+02,  -1.446840e+01,  3.743195e+01
+       5.675000e+08,  -1.412683e+01,  3.523903e+01,  -1.712264e-01,  1.252390e+02,  -1.712779e-01,  1.252390e+02,  -1.412683e+01,  3.523901e+01
+       ...
+    ```
+-   **Port Impedance**: Stored in `Sur_PEC\Data\Output\Z_in.txt`
+    ```
+       Frequency (Hz)   Real(Z11)       Imag(Z11)       Real(Z22)      Imag(Z22)      Real(Z12)       Imag(Z12)      Real(Z21)       Imag(Z21)
+       5.150000e+08,  0.000000e+00,  -1.355504e+02,  -0.000000e+00,  2.078720e+02,  -0.000000e+00,  2.078706e+02,  0.000000e+00,  -1.355489e+02
+       5.300000e+08,  0.000000e+00,  -1.288976e+02,  -0.000000e+00,  2.038118e+02,  -0.000000e+00,  2.038103e+02,  0.000000e+00,  -1.288961e+02
+       5.450000e+08,  0.000000e+00,  -1.225001e+02,  -0.000000e+00,  2.000577e+02,  -0.000000e+00,  2.000562e+02,  0.000000e+00,  -1.224985e+02
+       5.600000e+08,  0.000000e+00,  -1.163339e+02,  -0.000000e+00,  1.965888e+02,  -0.000000e+00,  1.965872e+02,  0.000000e+00,  -1.163323e+02
+       ...
+    ```
+-   **Port Admittance**: Stored in `Sur_PEC\Data\Output\Y_in.txt`
+    ```
+       Frequency (Hz)   Real(Y11)       Imag(Y11)       Real(Y22)       Imag(Y22)     Real(Y12)       Imag(Y12)      Real(Y21)      Imag(Y21)
+       5.150000e+08,  0.000000e+00,  -5.457594e-03,  0.000000e+00,  -8.369530e-03,  0.000000e+00,  -8.369473e-03,  0.000000e+00,  -5.457653e-03
+       5.300000e+08,  0.000000e+00,  -5.171451e-03,  0.000000e+00,  -8.177151e-03,  0.000000e+00,  -8.177091e-03,  0.000000e+00,  -5.171511e-03
+       5.450000e+08,  0.000000e+00,  -4.896669e-03,  0.000000e+00,  -7.996965e-03,  0.000000e+00,  -7.996903e-03,  0.000000e+00,  -4.896731e-03
+       5.600000e+08,  0.000000e+00,  -4.632269e-03,  0.000000e+00,  -7.828027e-03,  0.000000e+00,  -7.827964e-03,  0.000000e+00,  -4.632333e-03
+       ...
+    ```
 
-## 6. 参考文献
+***
+## 4. Important Notes
+
+1.  Ensure all necessary DLL files are located in the runtime directory.
+2.  The input format only supports GMSH mesh files (`.msh`). It is recommended to use GMSH for generation and ensure the mesh consists of triangular elements.
+3.  Material files must be written strictly according to the specified format to avoid parsing errors.
+4.  Be mindful of memory usage and computation time when simulating large models.
+
+## 5. Recommended Visualization Tools
+
+-   Mesh files (`.msh`) are recommended to be opened with **GMSH.exe**. GMSH.exe will directly generate interactive 3D graphics. (GMSH is included in the folder).
+-   Parameters such as current, voltage, port scattering parameters, and impedance parameters (`.txt`) are recommended to be visualized using data analysis tools like **Excel** or **Origin**.
+
+## 6. References
 
 [1] Jiang Y, Wu K L. Quasi-static surface-PEEC modeling of electromagnetic problem with finite dielectrics[J]. IEEE Transactions on Microwave Theory and Techniques, 2018, 67(2): 565-576.
 
-## 许可证与致谢
+## License and Acknowledgments
 
-本软件为科研与教育用途开发，版权归作者所有。  
-欢迎反馈与合作，共同推进国产EDA工具发展。
+This software is developed for research and educational purposes. Copyright belongs to the authors.
 
+Feedback and collaboration are welcome to jointly advance the development of domestic EDA tools.
