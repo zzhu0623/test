@@ -260,7 +260,7 @@ This section presents the results obtained from the software's built-in solver, 
 
 -   **Port Scattering Parameters (S-parameters)**: Stored in `Sur_PEC\Data\Output\map.txt`
     ```
-       Frequency (Hz)  Real(S11)(dB)     Imag(S11)    Real(S22)(dB)     Imag(S22)    Real(S12)(dB)    Imag(S12)     Real(S21)(dB)    Imag(S21)
+       Frequency (Hz)  Real(S11)(dB)   phase(S11)     Real(S12)(dB)   phase(S12)     Real(S21)(dB)   phase(S21)     Real(S22)(dB)   phase(S22)
        5.225000e+08,  -1.482463e+01,  3.962179e+01,  -1.453806e-01,  1.296218e+02,  -1.454241e-01,  1.296218e+02,  -1.482463e+01,  3.962182e+01
        5.450000e+08,  -1.446840e+01,  3.743193e+01,  -1.580369e-01,  1.274319e+02,  -1.580843e-01,  1.274319e+02,  -1.446840e+01,  3.743195e+01
        5.675000e+08,  -1.412683e+01,  3.523903e+01,  -1.712264e-01,  1.252390e+02,  -1.712779e-01,  1.252390e+02,  -1.412683e+01,  3.523901e+01
@@ -276,7 +276,7 @@ This section presents the results obtained from the software's built-in solver, 
     
 -   **Port Impedance**: Stored in `Sur_PEC\Data\Output\Z_in.txt`
     ```
-       Frequency (Hz)   Real(Z11)       Imag(Z11)       Real(Z22)      Imag(Z22)      Real(Z12)       Imag(Z12)      Real(Z21)       Imag(Z21)
+       Frequency (Hz)   Real(Z11)       Imag(Z11)       Real(Z12)      Imag(Z12)      Real(Z21)       Imag(Z21)      Real(Z22)       Imag(Z22)
        5.150000e+08,  0.000000e+00,  -1.355504e+02,  -0.000000e+00,  2.078720e+02,  -0.000000e+00,  2.078706e+02,  0.000000e+00,  -1.355489e+02
        5.300000e+08,  0.000000e+00,  -1.288976e+02,  -0.000000e+00,  2.038118e+02,  -0.000000e+00,  2.038103e+02,  0.000000e+00,  -1.288961e+02
        5.450000e+08,  0.000000e+00,  -1.225001e+02,  -0.000000e+00,  2.000577e+02,  -0.000000e+00,  2.000562e+02,  0.000000e+00,  -1.224985e+02
@@ -285,7 +285,7 @@ This section presents the results obtained from the software's built-in solver, 
     ```
 -   **Port Admittance**: Stored in `Sur_PEC\Data\Output\Y_in.txt`
     ```
-       Frequency (Hz)   Real(Y11)       Imag(Y11)       Real(Y22)       Imag(Y22)     Real(Y12)       Imag(Y12)      Real(Y21)      Imag(Y21)
+       Frequency (Hz)   Real(Y11)       Imag(Y11)       Real(Y12)      Imag(Y12)      Real(Y21)       Imag(Y21)      Real(Y22)      Imag(Y22)
        5.150000e+08,  0.000000e+00,  -5.457594e-03,  0.000000e+00,  -8.369530e-03,  0.000000e+00,  -8.369473e-03,  0.000000e+00,  -5.457653e-03
        5.300000e+08,  0.000000e+00,  -5.171451e-03,  0.000000e+00,  -8.177151e-03,  0.000000e+00,  -8.177091e-03,  0.000000e+00,  -5.171511e-03
        5.450000e+08,  0.000000e+00,  -4.896669e-03,  0.000000e+00,  -7.996965e-03,  0.000000e+00,  -7.996903e-03,  0.000000e+00,  -4.896731e-03
